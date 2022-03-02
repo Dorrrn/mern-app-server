@@ -18,7 +18,7 @@ router.get("/loggedin", (req, res) => {
 });
 
 router.post("/signup", (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
 
   if (!username) {
     return res
@@ -26,7 +26,13 @@ router.post("/signup", (req, res) => {
       .json({ errorMessage: "Please provide your username." });
   }
 
-  if (password.length < 8) {
+   if (!email) {
+     return res
+       .status(400)
+       .json({ errorMessage: "Please provide email." });
+   }
+
+  if (password.length < 4) {
     return res.status(400).json({
       errorMessage: "Your password needs to be at least 8 characters long.",
     });
@@ -45,10 +51,10 @@ router.post("/signup", (req, res) => {
   */
 
   // Search the database for a user with the username submitted in the form
-  User.findOne({ username }).then((found) => {
+  User.findOne({ email }).then((found) => {
     // If the user is found, send the message username is taken
     if (found) {
-      return res.status(400).json({ errorMessage: "Username already taken." });
+      return res.status(400).json({ errorMessage: "E-Mail already taken." });
     }
 
     // if user is not found, create a new user - start with hashing the password
@@ -59,6 +65,7 @@ router.post("/signup", (req, res) => {
         // Create a user and save it in the database
         return User.create({
           username,
+          email,
           password: hashedPassword,
         });
       })
@@ -73,7 +80,7 @@ router.post("/signup", (req, res) => {
         if (error.code === 11000) {
           return res.status(400).json({
             errorMessage:
-              "Username need to be unique. The username you chose is already in use.",
+              "E-Mail need to be unique. The e-mail you chose is already in use.",
           });
         }
         return res.status(500).json({ errorMessage: error.message });
@@ -82,12 +89,12 @@ router.post("/signup", (req, res) => {
 });
 
 router.post("/login", (req, res, next) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!username) {
+  if (!email) {
     return res
       .status(400)
-      .json({ errorMessage: "Please provide your username." });
+      .json({ errorMessage: "Please provide your email." });
   }
 
   // Here we use the same logic as above
@@ -99,7 +106,7 @@ router.post("/login", (req, res, next) => {
   }
 
   // Search the database for a user with the username submitted in the form
-  User.findOne({ username })
+  User.findOne({ email })
     .then((user) => {
       // If the user isn't found, send the message that user provided wrong credentials
       if (!user) {
@@ -114,7 +121,7 @@ router.post("/login", (req, res, next) => {
 
         const payload = {
           _id: user._id,
-          username: user.username,
+          email: user.email,
         };
 
         const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
