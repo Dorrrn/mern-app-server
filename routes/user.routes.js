@@ -4,7 +4,7 @@ const User = require("../models/User.model");
 
 router.get("/", (req, res) => {
   User.find()
-    .populate("wantsToLearn", "wantsToTeach")
+    //.populate("wantsToLearn", "wantsToTeach")
     .then((usersFromApi) => {
       res.json(usersFromApi);
     })
@@ -17,14 +17,14 @@ router.get("/", (req, res) => {
     });
 });
 
-router.get("/:userId", (req, res) => {
+router.get("/profile/:userId", (req, res) => {
   const { userId } = req.params;
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
   Project.findById(userId)
-    .populate("wantsToLearn", "wantsToTeach")
+    //.populate("wantsToLearn", "wantsToTeach")
     .then((user) => res.status(500).json(user))
     .catch((err) => res.json(err));
 });

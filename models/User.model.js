@@ -6,17 +6,7 @@ const userSchema = new Schema(
       type: String,
       unique: true,
     },
-    email: {
-      type: String,
-      unique: true,
-    },
-    password: {
-      type: String,
-      unique: true,
-    },
-    wantsToLearn: [{ type: Schema.Types.ObjectId, ref: "Skill" }],
-    wantsToTeach: [{ type: Schema.Types.ObjectId, ref: "Skill" }],
-    friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    password: String,
   },
   {
     timestamps: true,
