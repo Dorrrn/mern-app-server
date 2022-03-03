@@ -2,6 +2,7 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 const User = require("../models/User.model");
 const Skill = require("../models/Skill.model");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 router.get("/", (req, res) => {
   User.find()
@@ -22,7 +23,7 @@ router.get("/", (req, res) => {
 
 router.get("/:userId", (req, res) => {
   const { userId } = req.params;
-  
+
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
@@ -33,7 +34,7 @@ router.get("/:userId", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-router.put("/:userId", (req, res) => {
+router.put("/:userId", isAuthenticated, (req, res) => {
   const { userId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -54,22 +55,20 @@ router.put("/:userId", (req, res) => {
     .catch((err) => res.status(500).json(err));
 });
 
-
-router.post("/:userId/friend", (req, res) => {
-  const { userId } = req.params;
+router.post("/:friendId/addfriend", isAuthenticated, (req, res) => {
+  const { friendId } = req.params;
   const { _id } = req.payload;
 
   User.findByIdAndUpdate(_id, {
-    $push: { friends: userId}
+    $addToSet: { friends: friendId, new: true, upsert: true },
   })
+    .exec()
     .then((addedFriend) => {
-      res.status(201).json(addedFriend)
+      return res.json(addedFriend);
     })
     .catch((err) => {
       console.log("Error adding friend...", err);
-    })
+    });
 });
-
-
 
 module.exports = router;
