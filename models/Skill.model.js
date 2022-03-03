@@ -4,10 +4,10 @@ const skillSchema = new Schema({
   title: String,
   category: {
     type: String,
-    enum: ["language", "sports", "instrument", "coding language" ]
-  }
+    enum: ["language", "sports", "instrument", "coding language"],
+  },
 });
 
-const Skills = model("Skill", skillSchema);
+const Skill = model("Skill", skillSchema);
 
 module.exports = Skill;
