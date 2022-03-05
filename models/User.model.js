@@ -10,6 +10,7 @@ const userSchema = new Schema(
       type: String,
       unique: true,
     },
+    bio: String,
     wantsToLearn: [{ type: Schema.Types.ObjectId, ref: "Skill" }],
     wantsToTeach: [{ type: Schema.Types.ObjectId, ref: "Skill" }],
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],

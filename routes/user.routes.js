@@ -55,7 +55,35 @@ router.put("/:userId", isAuthenticated, (req, res) => {
     .catch((err) => res.status(500).json(err));
 });
 
-router.post("/:friendId/addfriend", isAuthenticated, (req, res) => {
+router.post("/updateskills", isAuthenticated, (req, res) => {
+  const { _id } = req.payload;
+
+  const skillDetails = {
+    title: req.body.title,
+    category: req.body.category,
+  };
+
+  Skill.create(skillDetails)
+    .then((skillCreated) => {
+      res.status(201).json(skillCreated);
+      return User.findByIdAndUpdate(_id, {
+        $addToSet: {
+          wantsToLearn: skillCreated._id,
+          new: true,
+          upsert: true,
+        },
+      }).exec();
+    })
+    .then((updatedUser) => {
+      res.json(updatedUser);
+    })
+    .catch((err) => {
+      console.log("Error adding skills...", err);
+    });
+});
+
+
+router.put("/:friendId/addfriend", isAuthenticated, (req, res) => {
   const { friendId } = req.params;
   const { _id } = req.payload;
 
