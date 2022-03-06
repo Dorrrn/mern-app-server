@@ -10,7 +10,6 @@ router.post("/", (req, res) => {
     category: req.body.category,
   };
   Skill.create(skillDetails)
-
     .then((skillCreated) => res.status(201).json(skillCreated))
     .catch((err) => {
       console.log("error creating a new skill", err);
@@ -48,6 +47,23 @@ router.put("/:skillId/wantstolearn", isAuthenticated, (req, res) => {
     })
     .catch((err) => {
       console.log("Error adding skill to learn...", err);
+    });
+});
+
+
+router.put("/:skillId/wantstoteach", isAuthenticated, (req, res) => {
+  const { skillId } = req.params;
+  const { _id } = req.payload;
+
+  User.findByIdAndUpdate(_id, {
+    $addToSet: { wantsToTeach: skillId, new: true, upsert: true },
+  })
+    .exec()
+    .then((addedSkill) => {
+      res.status(201).json(addedSkill);
+    })
+    .catch((err) => {
+      console.log("Error adding skill to teach...", err);
     });
 });
 

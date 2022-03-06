@@ -29,7 +29,9 @@ router.get("/:userId", (req, res) => {
     return;
   }
   User.findById(userId)
-    //.populate("wantsToLearn", "wantsToTeach")
+    .populate("wantsToLearn")
+    .populate("wantsToTeach")
+    //.populate("friends")
     .then((user) => res.status(500).json(user))
     .catch((err) => res.json(err));
 });
@@ -46,6 +48,7 @@ router.put("/:userId", isAuthenticated, (req, res) => {
     email: req.body.email,
     password: req.body.password,
     img: req.body.img,
+    bio: req.body.bio,
     wantsToLearn: [],
     wantsToLearn: [],
     friends: [],
@@ -55,14 +58,62 @@ router.put("/:userId", isAuthenticated, (req, res) => {
     .catch((err) => res.status(500).json(err));
 });
 
-router.post("/updateskills", isAuthenticated, (req, res) => {
+router.put("/updateprofile", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
 
+  const skillsToLearn = {
+    title: req.body.learnTitle,
+    category: req.body.learnCategory,
+  };
+
+  const skillsToTeach = {
+    title: req.body.teachTitle,
+    category: req.body.teachCategory,
+  };
+
+  const userDetails = {
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+    img: req.body.img,
+    bio: req.body.bio,
+  };
+
+  Skill.create(skillsToLearn).then((skillToLearnCreated) => {
+    res.status(201).json(skillToLearnCreated);
+    return Skill.create(skillsToTeach).then((skillToTeachCreated) => {
+      res.status(201).json(skillToTeachCreated);
+      return User.findByIdAndUpdate(_id, userDetails, {
+        $addToSet: [
+          {
+            wantsToLearn: skillToLearnCreated._id,
+            new: true,
+            upsert: true,
+          },
+          {
+            wantsToTeach: skillToTeachCreated._id,
+            new: true,
+            upsert: true,
+          },
+        ],
+      })
+        .exec()
+        .then((updatedUser) => {
+          res.json(updatedUser);
+        })
+        .catch((err) => {
+          console.log("Error updating profile...", err);
+        });
+    });
+  });
+});
+
+router.post("/updateskills", isAuthenticated, (req, res) => {
+  const { _id } = req.payload;
   const skillDetails = {
     title: req.body.title,
     category: req.body.category,
   };
-
   Skill.create(skillDetails)
     .then((skillCreated) => {
       res.status(201).json(skillCreated);
@@ -82,7 +133,6 @@ router.post("/updateskills", isAuthenticated, (req, res) => {
     });
 });
 
-
 router.put("/:friendId/addfriend", isAuthenticated, (req, res) => {
   const { friendId } = req.params;
   const { _id } = req.payload;
@@ -92,11 +142,26 @@ router.put("/:friendId/addfriend", isAuthenticated, (req, res) => {
   })
     .exec()
     .then((addedFriend) => {
-      return res.json(addedFriend);
+      res.json(addedFriend);
+      return User.findByIdAndUpdate(friendId, {
+        $addToSet: { friends: _id, new: true, upsert: true },
+      }).then((addedFriendBack) => {
+        res.json(addedFriendBack);
+      });
     })
     .catch((err) => {
       console.log("Error adding friend...", err);
     });
+});
+
+router.get("/search", (req, res) => {
+  const { searchQuery } = req.query;
+
+  User.find(searchQuery)
+    .populate("wantsToLearn")
+    .populate("wantsToTeach")
+    .then((users) => res.status(500).json(users))
+    .catch((err) => res.json(err));
 });
 
 module.exports = router;

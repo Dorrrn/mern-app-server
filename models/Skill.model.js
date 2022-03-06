@@ -1,12 +1,14 @@
 const { Schema, model } = require("mongoose");
 
 const skillSchema = new Schema({
-  title: String,
-  category: String
-  // category: {
-  //   type: String,
-  //   enum: ["language", "sports", "instrument", "coding language"],
-  // },
+  title: {
+    type: String,
+    unique: true,
+  },
+  category: {
+    type: String,
+    enum: ["language", "sports", "instrument", "coding language"],
+  }
 
 });
 
