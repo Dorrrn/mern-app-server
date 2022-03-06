@@ -34,7 +34,7 @@ router.get("/", (req, res) => {
     });
 });
 
-router.post("/createskill", isAuthenticated, (req, res) => {
+router.post("/create", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
   const skillDetails = {
     title: req.body.title,

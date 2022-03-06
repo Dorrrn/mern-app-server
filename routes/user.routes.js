@@ -36,7 +36,8 @@ router.get("/:userId", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-router.put("/editprofile", isAuthenticated, (req, res) => {
+
+router.put("/profile/edit", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
 
   if (!mongoose.Types.ObjectId.isValid(_id)) {
