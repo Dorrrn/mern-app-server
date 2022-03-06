@@ -34,6 +34,31 @@ router.get("/", (req, res) => {
     });
 });
 
+router.post("/createskill", isAuthenticated, (req, res) => {
+  const { _id } = req.payload;
+  const skillDetails = {
+    title: req.body.title,
+    category: req.body.category,
+  };
+  Skill.create(skillDetails)
+    .then((skillCreated) => {
+      res.status(201).json(skillCreated);
+      return User.findByIdAndUpdate(_id, {
+        $addToSet: {
+          wantsToLearn: skillCreated._id,
+          new: true,
+          upsert: true,
+        },
+      }).exec();
+    })
+    .then((updatedUser) => {
+      res.json(updatedUser);
+    })
+    .catch((err) => {
+      console.log("Error creating skill...", err);
+    });
+});
+
 router.put("/:skillId/wantstolearn", isAuthenticated, (req, res) => {
   const { skillId } = req.params;
   const { _id } = req.payload;

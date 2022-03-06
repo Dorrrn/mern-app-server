@@ -31,15 +31,15 @@ router.get("/:userId", (req, res) => {
   User.findById(userId)
     .populate("wantsToLearn")
     .populate("wantsToTeach")
-    //.populate("friends")
+    .populate("friends")
     .then((user) => res.status(500).json(user))
     .catch((err) => res.json(err));
 });
 
-router.put("/:userId", isAuthenticated, (req, res) => {
-  const { userId } = req.params;
+router.put("/editprofile", isAuthenticated, (req, res) => {
+  const { _id } = req.payload;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
+  if (!mongoose.Types.ObjectId.isValid(_id)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
@@ -53,10 +53,11 @@ router.put("/:userId", isAuthenticated, (req, res) => {
     wantsToLearn: [],
     friends: [],
   };
-  User.findByIdAndUpdate(userId, userDetails, { new: true })
+  User.findByIdAndUpdate(_id, userDetails, { new: true })
     .then((updatedUser) => res.json(updatedUser))
     .catch((err) => res.status(500).json(err));
 });
+
 
 router.put("/updateprofile", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
@@ -108,30 +109,7 @@ router.put("/updateprofile", isAuthenticated, (req, res) => {
   });
 });
 
-router.post("/updateskills", isAuthenticated, (req, res) => {
-  const { _id } = req.payload;
-  const skillDetails = {
-    title: req.body.title,
-    category: req.body.category,
-  };
-  Skill.create(skillDetails)
-    .then((skillCreated) => {
-      res.status(201).json(skillCreated);
-      return User.findByIdAndUpdate(_id, {
-        $addToSet: {
-          wantsToLearn: skillCreated._id,
-          new: true,
-          upsert: true,
-        },
-      }).exec();
-    })
-    .then((updatedUser) => {
-      res.json(updatedUser);
-    })
-    .catch((err) => {
-      console.log("Error adding skills...", err);
-    });
-});
+
 
 router.put("/:friendId/addfriend", isAuthenticated, (req, res) => {
   const { friendId } = req.params;
@@ -160,6 +138,7 @@ router.get("/search", (req, res) => {
   User.find(searchQuery)
     .populate("wantsToLearn")
     .populate("wantsToTeach")
+    .populate("friends")
     .then((users) => res.status(500).json(users))
     .catch((err) => res.json(err));
 });
