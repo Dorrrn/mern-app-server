@@ -75,7 +75,6 @@ router.put("/:skillId/wantstolearn", isAuthenticated, (req, res) => {
     });
 });
 
-
 router.put("/:skillId/wantstoteach", isAuthenticated, (req, res) => {
   const { skillId } = req.params;
   const { _id } = req.payload;
@@ -89,6 +88,35 @@ router.put("/:skillId/wantstoteach", isAuthenticated, (req, res) => {
     })
     .catch((err) => {
       console.log("Error adding skill to teach...", err);
+    });
+});
+
+router.delete("/:skillId/delete", (req, res) => {
+   const { skillId } = req.params;
+
+   Skill.findByIdAndDelete(skillId)
+   .then((skillDeleted) => {
+     res.json(skillDeleted)
+   })
+   .catch((err) => {
+     console.log(err)
+   })
+})
+
+router.put("/:skillId/removewantstolearn", (req, res) => {
+  const { skillId } = req.params;
+  const { _id } = req.body;
+
+  User.findByIdAndUpdate(_id, {
+    $pull: { wantsToLearn: {_id : skillId} },
+  })
+    .then(() => {
+      res
+        .status(201)
+        .json({ message: `Skill with ${skillId} is removed successfully.` });
+    })
+    .catch((err) => {
+      console.log("Error removing skill to from user", err);
     });
 });
 

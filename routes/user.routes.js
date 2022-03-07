@@ -36,7 +36,6 @@ router.get("/:userId", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-
 router.put("/profile/edit", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
 
@@ -50,15 +49,11 @@ router.put("/profile/edit", isAuthenticated, (req, res) => {
     password: req.body.password,
     img: req.body.img,
     bio: req.body.bio,
-    wantsToLearn: [],
-    wantsToLearn: [],
-    friends: [],
   };
   User.findByIdAndUpdate(_id, userDetails, { new: true })
     .then((updatedUser) => res.json(updatedUser))
     .catch((err) => res.status(500).json(err));
 });
-
 
 router.put("/updateprofile", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
@@ -109,8 +104,6 @@ router.put("/updateprofile", isAuthenticated, (req, res) => {
     });
   });
 });
-
-
 
 router.put("/:friendId/addfriend", isAuthenticated, (req, res) => {
   const { friendId } = req.params;
