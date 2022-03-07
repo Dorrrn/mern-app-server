@@ -120,4 +120,24 @@ router.put("/:skillId/removewantstolearn", isAuthenticated, (req, res) => {
     });
 });
 
+
+router.put("/:skillId/removewantstoteach", isAuthenticated, (req, res) => {
+  const { skillId } = req.params;
+  const { _id } = req.payload;
+
+  User.findByIdAndUpdate(_id, {
+    $pull: { wantsToTeach: skillId },
+  })
+    .then(() => {
+      res
+        .status(201)
+        .json({ message: `Skill with ${skillId} is removed successfully.` });
+    })
+    .catch((err) => {
+      console.log("Error removing skill to from user", err);
+    });
+});
+
+
+
 module.exports = router;

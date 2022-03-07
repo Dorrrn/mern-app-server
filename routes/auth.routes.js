@@ -101,7 +101,6 @@ router.post("/login", (req, res, next) => {
           return res.status(400).json({ errorMessage: "Wrong credentials." });
         }
         const authToken = generateToken(user);
-
         return res.json({ authToken: authToken });
       });
     })
