@@ -103,12 +103,12 @@ router.delete("/:skillId/delete", (req, res) => {
    })
 })
 
-router.put("/:skillId/removewantstolearn", (req, res) => {
+router.put("/:skillId/removewantstolearn", isAuthenticated, (req, res) => {
   const { skillId } = req.params;
-  const { _id } = req.body;
+  const { _id } = req.payload;
 
   User.findByIdAndUpdate(_id, {
-    $pull: { wantsToLearn: {_id : skillId} },
+    $pull: { wantsToLearn: skillId },
   })
     .then(() => {
       res

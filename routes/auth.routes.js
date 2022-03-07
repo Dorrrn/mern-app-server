@@ -86,7 +86,7 @@ router.post("/login", (req, res, next) => {
   if (!email) {
     return res.status(400).json({ errorMessage: "Please provide your email." });
   }
-  if (password.length < 8) {
+  if (password.length < 4) {
     return res.status(400).json({
       errorMessage: "Your password needs to be at least 8 characters long.",
     });
