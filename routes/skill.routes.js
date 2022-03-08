@@ -62,7 +62,6 @@ router.post("/create", isAuthenticated, (req, res) => {
 router.put("/:skillId/wantstolearn", isAuthenticated, (req, res) => {
   const { skillId } = req.params;
   const { _id } = req.payload;
-
   User.findByIdAndUpdate(_id, {
     $addToSet: { wantsToLearn: skillId, new: true, upsert: true },
   })
@@ -78,7 +77,6 @@ router.put("/:skillId/wantstolearn", isAuthenticated, (req, res) => {
 router.put("/:skillId/wantstoteach", isAuthenticated, (req, res) => {
   const { skillId } = req.params;
   const { _id } = req.payload;
-
   User.findByIdAndUpdate(_id, {
     $addToSet: { wantsToTeach: skillId, new: true, upsert: true },
   })
@@ -92,21 +90,19 @@ router.put("/:skillId/wantstoteach", isAuthenticated, (req, res) => {
 });
 
 router.delete("/:skillId/delete", (req, res) => {
-   const { skillId } = req.params;
-
-   Skill.findByIdAndDelete(skillId)
-   .then((skillDeleted) => {
-     res.json(skillDeleted)
-   })
-   .catch((err) => {
-     console.log(err)
-   })
-})
+  const { skillId } = req.params;
+  Skill.findByIdAndDelete(skillId)
+    .then((skillDeleted) => {
+      res.json(skillDeleted);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
 
 router.put("/:skillId/removewantstolearn", isAuthenticated, (req, res) => {
   const { skillId } = req.params;
   const { _id } = req.payload;
-
   User.findByIdAndUpdate(_id, {
     $pull: { wantsToLearn: skillId },
   })
@@ -120,11 +116,9 @@ router.put("/:skillId/removewantstolearn", isAuthenticated, (req, res) => {
     });
 });
 
-
 router.put("/:skillId/removewantstoteach", isAuthenticated, (req, res) => {
   const { skillId } = req.params;
   const { _id } = req.payload;
-
   User.findByIdAndUpdate(_id, {
     $pull: { wantsToTeach: skillId },
   })
@@ -137,7 +131,5 @@ router.put("/:skillId/removewantstoteach", isAuthenticated, (req, res) => {
       console.log("Error removing skill to from user", err);
     });
 });
-
-
 
 module.exports = router;
