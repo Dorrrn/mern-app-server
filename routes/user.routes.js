@@ -125,15 +125,15 @@ router.put("/:friendId/addfriend", isAuthenticated, (req, res) => {
     });
 });
 
-router.get("/search", (req, res) => {
-  const { searchQuery } = req.query;
+// router.get("/search", (req, res) => {
+//   const { searchQuery } = req.query;
 
-  User.find(searchQuery)
-    .populate("wantsToLearn")
-    .populate("wantsToTeach")
-    .populate("friends")
-    .then((users) => res.status(500).json(users))
-    .catch((err) => res.json(err));
-});
+//   User.find(searchQuery)
+//     .populate("wantsToLearn")
+//     .populate("wantsToTeach")
+//     .populate("friends")
+//     .then((users) => res.status(500).json(users))
+//     .catch((err) => res.json(err));
+// });
 
 module.exports = router;

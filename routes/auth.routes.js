@@ -113,7 +113,7 @@ router.get("/verify", isAuthenticated, (req, res, next) => {
   res.json(req.payload);
 });
 
-router.put("/profile/update", isAuthenticated, (req, res) => {
+router.put("/update", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
   const { username, email, password, img, bio } = req.body;
   if (!username) {
