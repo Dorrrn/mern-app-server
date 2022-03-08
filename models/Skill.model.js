@@ -7,7 +7,7 @@ const skillSchema = new Schema({
   },
   category: {
     type: String,
-    enum: ["language", "sports", "instrument", "coding language"],
+    enum: ["language", "sport", "instrument", "coding language"],
   }
 
 });
