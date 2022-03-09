@@ -21,6 +21,25 @@ router.get("/", (req, res) => {
     });
 });
 
+router.get("/matches", isAuthenticated, (req, res) => {
+  const { _id } = req.payload;
+  let mySkillsArr = [];
+
+  User.findById(_id)
+  .then((currentUser) => {
+    currentUser.wantsToLearn.map ((skill) => {
+      mySkillsArr.push(skill._id.toString()); 
+    })
+    return User.find({ wantsToTeach: { $in: mySkillsArr } });
+  })
+    .then((foundUsers) => {
+      res.json(foundUsers);
+    })
+    .catch((err) => {
+      console.log("no matches...", err);
+    });
+});
+
 router.get("/:userId", (req, res) => {
   const { userId } = req.params;
 
@@ -34,74 +53,6 @@ router.get("/:userId", (req, res) => {
     .populate("friends")
     .then((user) => res.status(500).json(user))
     .catch((err) => res.json(err));
-});
-
-router.put("/profile/edit", isAuthenticated, (req, res) => {
-  const { _id } = req.payload;
-  if (!mongoose.Types.ObjectId.isValid(_id)) {
-    res.status(400).json({ message: "Specified id is not valid" });
-    return;
-  }
-  const userDetails = {
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-    img: req.body.img,
-    bio: req.body.bio,
-  };
-  User.findByIdAndUpdate(_id, userDetails, { new: true })
-    .then((updatedUser) => res.json(updatedUser))
-    .catch((err) => res.status(500).json(err));
-});
-
-router.put("/updateprofile", isAuthenticated, (req, res) => {
-  const { _id } = req.payload;
-
-  const skillsToLearn = {
-    title: req.body.learnTitle,
-    category: req.body.learnCategory,
-  };
-
-  const skillsToTeach = {
-    title: req.body.teachTitle,
-    category: req.body.teachCategory,
-  };
-
-  const userDetails = {
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-    img: req.body.img,
-    bio: req.body.bio,
-  };
-
-  Skill.create(skillsToLearn).then((skillToLearnCreated) => {
-    res.status(201).json(skillToLearnCreated);
-    return Skill.create(skillsToTeach).then((skillToTeachCreated) => {
-      res.status(201).json(skillToTeachCreated);
-      return User.findByIdAndUpdate(_id, userDetails, {
-        $addToSet: [
-          {
-            wantsToLearn: skillToLearnCreated._id,
-            new: true,
-            upsert: true,
-          },
-          {
-            wantsToTeach: skillToTeachCreated._id,
-            new: true,
-            upsert: true,
-          },
-        ],
-      })
-        .exec()
-        .then((updatedUser) => {
-          res.json(updatedUser);
-        })
-        .catch((err) => {
-          console.log("Error updating profile...", err);
-        });
-    });
-  });
 });
 
 router.put("/:friendId/addfriend", isAuthenticated, (req, res) => {
