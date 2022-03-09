@@ -26,12 +26,15 @@ router.get("/matches", isAuthenticated, (req, res) => {
   let mySkillsArr = [];
 
   User.findById(_id)
-  .then((currentUser) => {
-    currentUser.wantsToLearn.map ((skill) => {
-      mySkillsArr.push(skill._id.toString()); 
+    .then((currentUser) => {
+      currentUser.wantsToLearn.map((skill) => {
+        mySkillsArr.push(skill._id.toString());
+      });
+      return User.find({ wantsToTeach: { $in: mySkillsArr } })
+        .populate("wantsToLearn")
+        .populate("wantsToTeach")
+        .populate("friends");
     })
-    return User.find({ wantsToTeach: { $in: mySkillsArr } });
-  })
     .then((foundUsers) => {
       res.json(foundUsers);
     })
