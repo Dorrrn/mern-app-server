@@ -22,6 +22,8 @@ router.post("/", (req, res) => {
 
 router.get("/", (req, res) => {
   Skill.find()
+  .sort({title: 1})
+  .exec()
     .then((skillsFromApi) => {
       res.json(skillsFromApi);
     })
