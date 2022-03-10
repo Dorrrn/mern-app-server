@@ -21,28 +21,6 @@ router.get("/", (req, res) => {
     });
 });
 
-// router.get("/matches", isAuthenticated, (req, res) => {
-//   const { _id } = req.payload;
-//   let mySkillsArr = [];
-
-//   User.findById(_id)
-//     .then((currentUser) => {
-//       currentUser.wantsToLearn.map((skill) => {
-//         mySkillsArr.push(skill._id.toString());
-//       });
-//       return User.find({ wantsToTeach: { $in: mySkillsArr } })
-//         .populate("wantsToLearn")
-//         .populate("wantsToTeach")
-//         .populate("friends");
-//     })
-//     .then((foundUsers) => {
-//       res.json(foundUsers);
-//     })
-//     .catch((err) => {
-//       console.log("no matches...", err);
-//     });
-// });
-
 router.get("/matches", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
   let myLearnArr = [];
