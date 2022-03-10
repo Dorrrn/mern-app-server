@@ -21,16 +21,45 @@ router.get("/", (req, res) => {
     });
 });
 
+// router.get("/matches", isAuthenticated, (req, res) => {
+//   const { _id } = req.payload;
+//   let mySkillsArr = [];
+
+//   User.findById(_id)
+//     .then((currentUser) => {
+//       currentUser.wantsToLearn.map((skill) => {
+//         mySkillsArr.push(skill._id.toString());
+//       });
+//       return User.find({ wantsToTeach: { $in: mySkillsArr } })
+//         .populate("wantsToLearn")
+//         .populate("wantsToTeach")
+//         .populate("friends");
+//     })
+//     .then((foundUsers) => {
+//       res.json(foundUsers);
+//     })
+//     .catch((err) => {
+//       console.log("no matches...", err);
+//     });
+// });
+
 router.get("/matches", isAuthenticated, (req, res) => {
   const { _id } = req.payload;
-  let mySkillsArr = [];
+  let myLearnArr = [];
+  let myTeachArr = [];
 
   User.findById(_id)
     .then((currentUser) => {
       currentUser.wantsToLearn.map((skill) => {
-        mySkillsArr.push(skill._id.toString());
+        myLearnArr.push(skill._id.toString());
       });
-      return User.find({ wantsToTeach: { $in: mySkillsArr } })
+      currentUser.wantsToTeach.map((skill) => {
+        myTeachArr.push(skill._id.toString());
+      });
+      return User.find({
+        wantsToTeach: { $in: myLearnArr },
+        wantsToLearn: { $in: myTeachArr },
+      })
         .populate("wantsToLearn")
         .populate("wantsToTeach")
         .populate("friends");
@@ -45,7 +74,6 @@ router.get("/matches", isAuthenticated, (req, res) => {
 
 router.get("/:userId", (req, res) => {
   const { userId } = req.params;
-
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
